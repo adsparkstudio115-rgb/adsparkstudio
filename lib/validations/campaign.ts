@@ -1,0 +1,2 @@
+import {z} from "zod";
+export const campaignSchema=z.object({name:z.string().trim().min(3).max(100),niche:z.literal("Photography Studio"),city:z.string().trim().min(2).max(80).default("Chennai"),state:z.string().trim().min(2).max(80).default("Tamil Nadu"),country:z.string().trim().min(2).max(80).default("India"),radiusKm:z.number().int().min(1).max(50).default(10),maxResults:z.number().int().min(1).max(200).default(100)});
