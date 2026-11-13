@@ -44,10 +44,10 @@ export async function POST(request: Request) {
       owner_id:user.id,lead_id:lead.id,template_id:"photography-elegant-v1",
       brand_data:{...content,businessName:lead.business_name,locality:lead.business_address,category:lead.business_category,phone:lead.phone,website:lead.website_url,instagram:lead.instagram_url,conceptOnly:true},
       status:"ready",
-    }).select("id").single();
+    }).select("id,share_token").single();
     if(saveError) return NextResponse.json({ok:false,error:"Homepage was generated but could not be saved: "+saveError.message},{status:500});
     await supabase.from("leads").update({status:"demo_ready"}).eq("id",lead.id).eq("owner_id",user.id);
-    return NextResponse.json({ok:true,demoId:demo.id,url:"/demos/"+demo.id});
+    return NextResponse.json({ok:true,demoId:demo.id,url:"/preview/"+demo.share_token});
   } catch(error) {
     return NextResponse.json({ok:false,error:error instanceof Error?error.message:"Unexpected demo generation error."},{status:500});
   }
