@@ -97,12 +97,14 @@ export async function POST(request: Request) {
     }));
 
     let saved = 0;
+    const leadIdByPlaceId = new Map<string, string>();
     if (rows.length) {
       const { data, error } = await supabase.from("leads")
         .upsert(rows, { onConflict: "owner_id,google_place_id" })
-        .select("id");
+        .select("id,google_place_id");
       if (error) return NextResponse.json({ ok: false, error: `Search succeeded, but saving leads failed: ${error.message}` }, { status: 500 });
       saved = data?.length ?? 0;
+      for (const item of data ?? []) leadIdByPlaceId.set(item.google_place_id, item.id);
     }
 
     return NextResponse.json({
@@ -114,6 +116,7 @@ export async function POST(request: Request) {
       note: "Google Places text search does not reliably provide latest-review dates or Instagram activity. Those require a separate evidence-based research step.",
       results: enriched.map(({ place, hasPhone, hasWebsite, reviewCount, qualified, score }) => ({
         placeId: place.id,
+        leadId: leadIdByPlaceId.get(place.id) ?? null,
         name: place.displayName?.text || "Unnamed business",
         address: place.formattedAddress || null,
         phone: place.nationalPhoneNumber || null,
