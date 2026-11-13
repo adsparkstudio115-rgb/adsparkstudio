@@ -9,13 +9,13 @@ export default async function DemoPreviewPage({params}:{params:Promise<{id:strin
   const supabase=await createClient();
   const {data:{user}}=await supabase.auth.getUser();
   if(!user) redirect("/login");
-  const {data:demo}=await supabase.from("demo_projects").select("id,lead_id,brand_data,status,created_at").eq("id",id).eq("owner_id",user.id).single();
+  const {data:demo}=await supabase.from("demo_projects").select("id,lead_id,brand_data,status,created_at,share_token").eq("id",id).eq("owner_id",user.id).single();
   if(!demo) notFound();
   const {data:lead}=await supabase.from("leads").select("id,business_name,phone,business_address").eq("id",demo.lead_id).eq("owner_id",user.id).single();
   if(!lead) notFound();
   const d=demo.brand_data as {heroTitle?:string;tagline?:string;introduction?:string;primaryCta?:string;services?:string[];sections?:{title:string;description:string}[];visualDirection?:string;palette?:string[];businessName?:string;locality?:string;conceptOnly?:boolean};
   return <main className="demo-workspace">
-    <div className="demo-toolbar"><Link href="/finder">← Back to leads</Link><span>HOMEPAGE CONCEPT · NOT YET PUBLISHED</span><DemoActions phone={lead.phone} businessName={lead.business_name} demoUrl={`${process.env.NEXT_PUBLIC_SITE_URL||"https://adsparkstudio-lilac.vercel.app"}/demos/${demo.id}`} /></div>
+    <div className="demo-toolbar"><Link href="/finder">← Back to leads</Link><span>HOMEPAGE CONCEPT · NOT YET PUBLISHED</span><DemoActions phone={lead.phone} businessName={lead.business_name} demoUrl={`${process.env.NEXT_PUBLIC_SITE_URL||"https://adsparkstudio-lilac.vercel.app"}/preview/${demo.share_token}`} /></div>
     <section className="demo-browser"><div className="demo-browser-bar"><i/><i/><i/><span>{lead.business_name.toLowerCase().replace(/[^a-z0-9]+/g,"-")}.preview</span></div>
       <div className="demo-site" style={{"--demo-accent":d.palette?.[0]||"#b99a72","--demo-secondary":d.palette?.[1]||"#26211d","--demo-bg":d.palette?.[2]||"#f5f0e9"} as React.CSSProperties}>
         <header className="demo-site-header"><b>{lead.business_name}</b><nav><span>HOME</span><span>PORTFOLIO</span><span>ABOUT</span><span>CONTACT</span></nav><button>ENQUIRE</button></header>
