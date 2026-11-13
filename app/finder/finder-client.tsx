@@ -27,7 +27,7 @@ export default function FinderClient(){
   catch(e){setError(e instanceof Error?e.message:"Unexpected search error");}finally{setBusy(false);}
  }
  function whatsappUrl(lead:LeadResult,demoUrl:string){
-  if(!lead.phone)return null;const digits=lead.phone.replace(/\\D/g,"");
+  if(!lead.phone)return null;const digits=lead.phone.replace(/\D/g,"");
   const message=`Hi! We came across ${lead.name} and created a personalised website homepage concept for your studio. You can preview it here: ${window.location.origin}${demoUrl}\n\nWe are Adspark Studio. If you like the direction, we would be happy to discuss building a complete website for your business. Thank you!`;
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
  }
