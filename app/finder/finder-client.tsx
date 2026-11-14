@@ -29,12 +29,21 @@ type SearchResponse = {
 };
 
 function toWhatsAppNumber(phone: string) {
-  const digits = phone.replace(/\\D/g, "");
+  const digits = phone.replace(/\D/g, "");
   if (!digits) return "";
   if (digits.startsWith("91") && digits.length === 12) return digits;
   if (digits.startsWith("0") && digits.length === 11) return "91" + digits.slice(1);
   if (digits.length === 10) return "91" + digits;
   return digits;
+}
+
+
+function toDisplayPhone(phone: string) {
+  const number = toWhatsAppNumber(phone);
+  if (number.startsWith("91") && number.length === 12) {
+    return "+91 " + number.slice(2, 7) + " " + number.slice(7);
+  }
+  return phone;
 }
 
 function proposalMessage(lead: LeadResult) {
@@ -103,11 +112,10 @@ export default function FinderClient() {
     }
     setError("");
     const text = proposalMessage(lead);
-    window.open(
-      `https://wa.me/${number}?text=${encodeURIComponent(text)}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
+    const whatsappUrl = new URL("https://web.whatsapp.com/send");
+    whatsappUrl.searchParams.set("phone", number);
+    whatsappUrl.searchParams.set("text", text);
+    window.open(whatsappUrl.toString(), "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -211,7 +219,7 @@ export default function FinderClient() {
                   title={lead.phone ? `Open WhatsApp chat with ${lead.phone}` : "No public phone number listed"}
                 >
                   <MessageCircle size={14} />
-                  {lead.phone ? `Message on WhatsApp · ${lead.phone}` : "No phone number"}
+                  {lead.phone ? `Open WhatsApp Web · ${toDisplayPhone(lead.phone)}` : "No phone number"}
                 </button>
               </div>
 
@@ -237,7 +245,7 @@ export default function FinderClient() {
                     onClick={() => messageStudio(lead)}
                   >
                     <MessageCircle size={14} />
-                    {lead.phone ? `Message ${lead.name} · ${lead.phone}` : "No public phone number"}
+                    {lead.phone ? `Open WhatsApp Web · ${toDisplayPhone(lead.phone)}` : "No public phone number"}
                   </button>
                 </div>
               )}
