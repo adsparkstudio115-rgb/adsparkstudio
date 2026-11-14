@@ -56,6 +56,11 @@ Would you like to know more?`;
   const withImage=includeDemo&&demos[lead.placeId]?text+"\n\nDemo image: "+demos[lead.placeId].imageUrl:text;
   window.open(`https://wa.me/${digits}?text=${encodeURIComponent(withImage)}`,"_blank","noopener,noreferrer");
  }
+ function sendDemoImage(lead:LeadResult){
+  const demo=demos[lead.placeId];if(!demo)return;
+  openWhatsApp(lead,true);
+  const anchor=document.createElement("a");anchor.href=demo.imageUrl;anchor.download=`${lead.name.replace(/[^a-z0-9]/gi,"-").toLowerCase()}-homepage-demo.webp`;anchor.rel="noreferrer";document.body.appendChild(anchor);anchor.click();anchor.remove();
+ }
  function setFile(placeId:string,kind:"business"|"reference",file:File|null){
   setUploads(v=>({...v,[placeId]:{business:v[placeId]?.business??null,reference:v[placeId]?.reference??null,[kind]:file}}));
  }
@@ -98,7 +103,7 @@ Would you like to know more?`;
        <div className="demo-result-actions"><a className="secondary-btn" href={demo.imageUrl} download={`${lead.name.replace(/[^a-z0-9]/gi,"-").toLowerCase()}-homepage-demo.webp`}><Download size={14}/> Download image</a><a className="secondary-btn" href={demo.url} target="_blank" rel="noreferrer">Preview website <ExternalLink size={13}/></a></div>
        <div className="workflow-step-title message-step"><span>05</span><div><b>Prepare WhatsApp message</b><small>Generate a personal message and review it before sending.</small></div></div>
        <button type="button" className="secondary-btn" onClick={()=>draftMessage(lead)}><Sparkles size={14}/> Generate personalized message</button>
-       {messages[lead.placeId]&&<><textarea className="outreach-message" value={messages[lead.placeId]} onChange={e=>setMessages(v=>({...v,[lead.placeId]:e.target.value}))} rows={7}/><div className="demo-result-actions"><button type="button" className="whatsapp-action" disabled={!lead.phone} onClick={()=>openWhatsApp(lead,false)}><MessageCircle size={14}/> Send message on WhatsApp</button><button type="button" className="whatsapp-action" disabled={!lead.phone} onClick={()=>openWhatsApp(lead,true)}><ImagePlus size={14}/> Share demo link on WhatsApp</button></div><small className="search-footnote">WhatsApp opens with the message and demo link. To attach the actual image, download it above and add it in WhatsApp before sending.</small></>}
+       {messages[lead.placeId]&&<><textarea className="outreach-message" value={messages[lead.placeId]} onChange={e=>setMessages(v=>({...v,[lead.placeId]:e.target.value}))} rows={7}/><div className="demo-result-actions"><button type="button" className="whatsapp-action" disabled={!lead.phone} onClick={()=>openWhatsApp(lead,false)}><MessageCircle size={14}/> Send message on WhatsApp</button><button type="button" className="whatsapp-action" disabled={!lead.phone} onClick={()=>sendDemoImage(lead)><ImagePlus size={14}/> Send demo image on WhatsApp</button></div><small className="search-footnote">WhatsApp opens with the message and demo link. To attach the actual image, download it above and add it in WhatsApp before sending.</small></>}
       </div>}
      </div>}
     </article>
